@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foodapp/screens/addAddress.dart';
 import 'package:foodapp/screens/home.dart';
 
 void main(){

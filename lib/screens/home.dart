@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodapp/models/foodlist.dart';
 import 'package:http/http.dart' as http;
+import 'package:foodapp/widgets/circularProgressIndicator.dart';
+
 
 class Home extends StatefulWidget {
 
@@ -13,12 +15,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String imageUrl;
+  bool isLoading = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    loadFoodList();
+    this.loadFoodList();
   }
 
   @override
@@ -101,7 +104,7 @@ class _HomeState extends State<Home> {
                           return Column(
                             children: <Widget>[
                               Container(
-                                child: specialOffers('assets/images/steak.jpg', allFoodList[index].foodName, "\$ "+allFoodList[index].price),
+                                child: allFoodList.contains(null) || isLoading == true || allFoodList.length <0 ? Center(child: circularProgress()) : specialOffers('assets/images/steak.jpg', allFoodList[index].foodName, "\$ "+allFoodList[index].price),
                               ),
                             ],
                           );
@@ -473,11 +476,25 @@ class _HomeState extends State<Home> {
   List<FoodList> allFoodList = List();
 
   Future loadFoodList() async{
+    setState(() {
+      isLoading = true;
+    });
     final response = await http.get("http://food.gono.xyz/api/v1/food/list");
-    var foodList = jsonDecode(response.body);
-    for(var foodItems in foodList){
-      allFoodList.add(FoodList.fromJson(foodItems));
+    if(response.statusCode == 200){
+      setState(() {
+        isLoading = false;
+      });
+      var foodList = jsonDecode(response.body);
+      for(var foodItems in foodList){
+        allFoodList.add(FoodList.fromJson(foodItems));
+      }
     }
+    else{
+      setState(() {
+        isLoading = false;
+      });
+    }
+
     //print(allFoodList[0].foodName);
   }
 }
